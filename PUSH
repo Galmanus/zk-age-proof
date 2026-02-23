@@ -1,0 +1,43 @@
+# Git Commands to Push to GitHub
+
+Run these commands in your terminal from the `zk-age-proof` directory:
+
+```
+bash
+# 1. Navigate to the project directory
+cd /home/galmanus/Documents/zk/zk-age-proof
+
+# 2. Initialize git (if not already done)
+git init
+
+# 3. Add all files
+git add .
+
+# 4. Create initial commit
+git commit -m "Initial commit: zk-age-proof ZK age verification project"
+
+# 5. Add remote repository
+git remote add origin git@github.com:Galmanus/zk-age-proof.git
+
+# 6. Push to GitHub (create main branch)
+git push -u origin main
+```
+
+## If you get "Permission denied" error:
+
+Make sure your SSH key is added to GitHub:
+```
+bash
+# Copy your SSH public key
+cat ~/.ssh/id_rsa.pub
+```
+
+Then add it to GitHub: https://github.com/settings/keys
+
+## Alternative: Using HTTPS instead of SSH
+
+If SSH doesn't work, use HTTPS:
+```
+bash
+git remote add origin https://github.com/Galmanus/zk-age-proof.git
+git push -u origin main

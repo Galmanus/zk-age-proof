@@ -1,0 +1,31 @@
+{
+  "name": "zk-age-proof",
+  "version": "1.0.0",
+  "description": "Zero-Knowledge Age Verification using Circom and snarkjs",
+  "main": "index.js",
+  "scripts": {
+    "compile": "cd circuits && circom ageVerifier.circom --r1cs --wasm --sym --c",
+    "setup": "bash scripts/setup.sh",
+    "prove": "bash scripts/prove.sh",
+    "verify": "bash scripts/verify.sh",
+    "all": "bash scripts/run.sh"
+  },
+  "keywords": [
+    "zkp",
+    "zero-knowledge",
+    "circom",
+    "snarkjs",
+    "age-verification"
+  ],
+  "author": "zk-age-proof",
+  "license": "MIT",
+  "dependencies": {
+    "circomlib": "^2.0.5"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/zk-age-proof"
+  }
+}
+
