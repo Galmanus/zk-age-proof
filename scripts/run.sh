@@ -83,12 +83,19 @@ if [ ! -f "$KEYS_DIR/pot12_0000.ptau" ]; then
     # Using an existing powers of tau file for testing
     # For production, do your own ceremony
     snarkjs powersoftau new bn128 12 "$KEYS_DIR/pot12_0000.ptau" -v
-    
+
     echo "Contributing to the setup..."
     echo "test" | snarkjs powersoftau contribute "$KEYS_DIR/pot12_0000.ptau" "$KEYS_DIR/pot12_0001.ptau" --name="first contribution" -v
+
+    echo "Preparing powers of tau..."
+    snarkjs powersoftau prepare phase2 "$KEYS_DIR/pot12_0001.ptau" "$KEYS_DIR/pot12_final.ptau" -v
 else
     echo "Using existing powers of tau..."
-    cp "$KEYS_DIR/pot12_0000.ptau" "$KEYS_DIR/pot12_0001.ptau"
+    if [ -f "$KEYS_DIR/pot12_final.ptau" ]; then
+        cp "$KEYS_DIR/pot12_final.ptau" "$KEYS_DIR/pot12_0001.ptau"
+    else
+        cp "$KEYS_DIR/pot12_0000.ptau" "$KEYS_DIR/pot12_0001.ptau"
+    fi
 fi
 
 echo -e "${GREEN}✓ Powers of Tau completed!${NC}"
@@ -99,7 +106,7 @@ echo ""
 # -----------------------------------------------------------------------------
 echo -e "${YELLOW}[4/6] Generating verification keys (Phase 2)...${NC}"
 
-snarkjs groth16 setup "$CIRCUIT_DIR/${CIRCUIT_NAME}.r1cs" "$KEYS_DIR/pot12_0001.ptau" "$KEYS_DIR/circuit_0000.zkey"
+snarkjs groth16 setup "$CIRCUIT_DIR/${CIRCUIT_NAME}.r1cs" "$KEYS_DIR/pot12_final.ptau" "$KEYS_DIR/circuit_0000.zkey"
 
 echo "Contributing to phase 2..."
 echo "test" | snarkjs zkey contribute "$KEYS_DIR/circuit_0000.zkey" "$KEYS_DIR/circuit_0001.zkey" --name="contribution" -v
@@ -118,17 +125,13 @@ echo ""
 # -----------------------------------------------------------------------------
 echo -e "${YELLOW}[5/6] Generating Zero-Knowledge proof...${NC}"
 
-# Generate witness
-node "$CIRCUIT_DIR/${CIRCUIT_NAME}_js/generate_witness.js" \
-    "$CIRCUIT_DIR/${CIRCUIT_NAME}_js/${CIRCUIT_NAME}.wasm" \
-    "$INPUT_FILE" \
-    "$KEYS_DIR/witness.wtns"
+# Generate witness using snarkjs
+snarkjs wtns calculate "$CIRCUIT_DIR/${CIRCUIT_NAME}.wasm" "$INPUT_FILE" "$KEYS_DIR/witness.wtns"
 
 # Generate proof
-snarkjs groth16 fullprove \
-    "$INPUT_FILE" \
-    "$CIRCUIT_DIR/${CIRCUIT_NAME}_js/${CIRCUIT_NAME}.wasm" \
+snarkjs groth16 prove \
     "$KEYS_DIR/circuit_0001.zkey" \
+    "$KEYS_DIR/witness.wtns" \
     "$KEYS_DIR/proof.json" \
     "$KEYS_DIR/public.json"
 
